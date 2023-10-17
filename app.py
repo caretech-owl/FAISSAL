@@ -15,6 +15,7 @@ if uploaded_file is not None:
     filetype = pathlib.Path(uploaded_file.name).suffix
     with NamedTemporaryFile(dir='.', suffix=filetype) as f:
         f.write(uploaded_file.getbuffer())
+        f.flush()
         docs = df_from_doc.df_from_doc(f.name, str(filetype).replace(".", ""))
     
     model_name = st.selectbox("Select Sentence-Transformers Model for Embeddings:", ["all-MiniLM-L6-v2", "multi-qa-mpnet-base-dot-v1"])
@@ -29,7 +30,7 @@ if uploaded_file is not None:
     wrap_print.wrap_print(context)
 
     model_type = st.selectbox("Select LLM Type:", ["LLaMA-7B", "LLaMA-13B"])
-    llm = load_llm.load_llm(model_type= model_type, model_path= None)
+    llm = load_llm.load_llm(model_type=model_type, model_path=f"./models/{model_type}.gguf")
     context_dependency = st.selectbox("Select Context Dependence Level (set to low if the model is failing to generate context dependent answers):", ["low", "medium", "high"])
 
     if st.button("Generate Response"):
